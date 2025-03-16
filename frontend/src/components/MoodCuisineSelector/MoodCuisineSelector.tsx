@@ -1,0 +1,89 @@
+import React from 'react';
+import { Box, Typography, Autocomplete, Chip, TextField } from '@mui/material';
+import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
+import RestaurantIcon from '@mui/icons-material/Restaurant';
+import SpaIcon from '@mui/icons-material/Spa';
+import PublicIcon from '@mui/icons-material/Public';
+import { moodCuisineSelectorStyles } from './MoodCuisineSelector.styles';
+
+export interface Preference {
+  id: string;
+  label: string;
+  type: 'mood' | 'cuisine';
+  icon: JSX.Element;
+}
+
+const preferences: Preference[] = [
+  // Moods
+  { id: 'spicy', label: 'Spicy', type: 'mood', icon: <LocalFireDepartmentIcon /> },
+  { id: 'healthy', label: 'Healthy', type: 'mood', icon: <SpaIcon /> },
+  { id: 'comfort', label: 'Comfort Food', type: 'mood', icon: <RestaurantIcon /> },
+  
+  // Cuisines
+  { id: 'italian', label: 'Italian', type: 'cuisine', icon: <PublicIcon /> },
+  { id: 'indian', label: 'Indian', type: 'cuisine', icon: <PublicIcon /> },
+  { id: 'mexican', label: 'Mexican', type: 'cuisine', icon: <PublicIcon /> },
+  { id: 'chinese', label: 'Chinese', type: 'cuisine', icon: <PublicIcon /> },
+  { id: 'japanese', label: 'Japanese', type: 'cuisine', icon: <PublicIcon /> },
+  { id: 'mediterranean', label: 'Mediterranean', type: 'cuisine', icon: <PublicIcon /> },
+];
+
+interface MoodCuisineSelectorProps {
+  onPreferencesChange?: (preferences: Preference[]) => void;
+}
+
+const MoodCuisineSelector: React.FC<MoodCuisineSelectorProps> = ({ onPreferencesChange }) => {
+  const handleChange = (_: any, newValue: Preference[]) => {
+    onPreferencesChange?.(newValue);
+  };
+
+  return (
+    <Box sx={moodCuisineSelectorStyles.container}>
+      <Typography variant="h6" sx={moodCuisineSelectorStyles.title}>
+        Any specific preferences?
+      </Typography>
+      <Autocomplete
+        multiple
+        options={preferences}
+        getOptionLabel={(option) => option.label}
+        onChange={handleChange}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            variant="outlined"
+            placeholder="Select mood or cuisine"
+            sx={moodCuisineSelectorStyles.input}
+          />
+        )}
+        renderTags={(value: Preference[], getTagProps) =>
+          value.map((option: Preference, index: number) => (
+            <Chip
+              key={option.id}
+              label={option.label}
+              icon={option.icon}
+              {...getTagProps({ index })}
+              sx={moodCuisineSelectorStyles.chip}
+            />
+          ))
+        }
+        renderOption={(props, option) => (
+          <Box component="li" {...props} sx={moodCuisineSelectorStyles.option}>
+            {option.icon}
+            <Typography sx={moodCuisineSelectorStyles.optionText}>
+              {option.label}
+            </Typography>
+            <Typography
+              variant="caption"
+              sx={moodCuisineSelectorStyles.optionType}
+            >
+              {option.type}
+            </Typography>
+          </Box>
+        )}
+        groupBy={(option) => option.type}
+      />
+    </Box>
+  );
+};
+
+export default MoodCuisineSelector; 
