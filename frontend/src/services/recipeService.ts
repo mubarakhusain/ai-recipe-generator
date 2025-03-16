@@ -8,6 +8,12 @@ interface GenerateRecipeRequest {
   preferences: string[];
 }
 
+// Define API URL based on environment
+const API_URL = import.meta.env.VITE_API_URL || 
+                (import.meta.env.PROD 
+                  ? '/api/recipes/generate'  // In production, use relative URL which will be handled by Vercel rewrites
+                  : 'http://localhost:3001/api/recipes/generate'); // In development, use localhost
+
 export const recipeService = {
   generateRecipe: async (
     ingredients: string[],
@@ -21,6 +27,7 @@ export const recipeService = {
     };
 
     console.log('Sending request to backend:', JSON.stringify(request, null, 2));
+    console.log('Using API URL:', API_URL);
 
     try {
       // Check if required data is available
@@ -34,7 +41,7 @@ export const recipeService = {
         throw new Error('No preferences provided');
       }
 
-      const response = await fetch('http://localhost:3001/api/recipes/generate', {
+      const response = await fetch(API_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
