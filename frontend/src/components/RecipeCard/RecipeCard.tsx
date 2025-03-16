@@ -17,6 +17,9 @@ import RestaurantIcon from '@mui/icons-material/Restaurant';
 import GroupIcon from '@mui/icons-material/Group';
 import { recipeCardStyles } from './RecipeCard.styles';
 
+// Default recipe image
+const DEFAULT_RECIPE_IMAGE = 'https://images.unsplash.com/photo-1495521821757-a1efb6729352?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=80';
+
 export interface Recipe {
   title: string;
   prepTime: string;
@@ -49,7 +52,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
       <CardMedia
         component="img"
         height="300"
-        image={imageUrl || '/recipe-placeholder.jpg'}
+        image={imageUrl || DEFAULT_RECIPE_IMAGE}
         alt={title}
         sx={recipeCardStyles.media}
       />

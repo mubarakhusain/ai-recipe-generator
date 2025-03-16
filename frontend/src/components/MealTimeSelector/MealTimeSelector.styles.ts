@@ -32,19 +32,22 @@ export const mealTimeSelectorStyles = {
   } as SxProps<Theme>,
 
   toggleButton: {
-    border: '2px solid #e0e0e0',
+    border: '2px solid #e0e0e0 !important',
     borderRadius: '12px !important',
     padding: '1rem',
+    transition: 'all 0.2s ease-in-out',
+    color: '#666666',
     '&:hover': {
       backgroundColor: '#FFA50010',
-      borderColor: '#FFA500',
+      borderColor: '#FFA500 !important',
+      color: '#FFA500',
     },
     '&.Mui-selected': {
-      backgroundColor: '#FFA50020',
-      borderColor: '#FFA500',
+      backgroundColor: '#FFA50020 !important',
+      borderColor: '#FFA500 !important',
       color: '#FFA500',
       '&:hover': {
-        backgroundColor: '#FFA50030',
+        backgroundColor: '#FFA50030 !important',
       },
     },
   } as SxProps<Theme>,
