@@ -1,11 +1,13 @@
-import { ThemeProvider, CssBaseline, Container, Box } from '@mui/material';
+import { ThemeProvider, CssBaseline, Container, Box, Button, CircularProgress } from '@mui/material';
 import { createTheme } from '@mui/material/styles';
+import { useState } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import IngredientInput from './components/IngredientInput';
 import MealTimeSelector, { MealTime } from './components/MealTimeSelector';
 import MoodCuisineSelector, { Preference } from './components/MoodCuisineSelector';
 import RecipeCard, { Recipe } from './components/RecipeCard';
+import { recipeService } from './services/recipeService';
 
 const theme = createTheme({
   palette: {
@@ -58,16 +60,47 @@ const sampleRecipe: Recipe = {
 };
 
 function App() {
-  const handleIngredientsChange = (ingredients: string[]) => {
-    console.log('Ingredients updated:', ingredients);
+  const [ingredients, setIngredients] = useState<string[]>([]);
+  const [mealTime, setMealTime] = useState<MealTime | null>(null);
+  const [preferences, setPreferences] = useState<Preference[]>([]);
+  const [recipe, setRecipe] = useState<Recipe | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleIngredientsChange = (newIngredients: string[]) => {
+    setIngredients(newIngredients);
   };
 
-  const handleMealTimeChange = (mealTime: MealTime) => {
-    console.log('Meal time selected:', mealTime);
+  const handleMealTimeChange = (newMealTime: MealTime) => {
+    setMealTime(newMealTime);
   };
 
-  const handlePreferencesChange = (preferences: Preference[]) => {
-    console.log('Preferences selected:', preferences);
+  const handlePreferencesChange = (newPreferences: Preference[]) => {
+    setPreferences(newPreferences);
+  };
+
+  const handleSubmit = async () => {
+    if (!ingredients.length || !mealTime || !preferences.length) {
+      setError('Please fill in all fields before generating a recipe');
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const generatedRecipe = await recipeService.generateRecipe(
+        ingredients,
+        mealTime,
+        preferences
+      );
+      setRecipe(generatedRecipe);
+    } catch (err) {
+      setError('Failed to generate recipe. Please try again.');
+      console.error('Error generating recipe:', err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -82,10 +115,48 @@ function App() {
       >
         <Header />
         <Container sx={{ flex: 1, py: 4 }}>
-          <IngredientInput onIngredientsChange={handleIngredientsChange} />
-          <MealTimeSelector onMealTimeChange={handleMealTimeChange} />
-          <MoodCuisineSelector onPreferencesChange={handlePreferencesChange} />
-          <RecipeCard recipe={sampleRecipe} />
+          <Box sx={{ mb: 4 }}>
+            <IngredientInput onIngredientsChange={handleIngredientsChange} />
+          </Box>
+          <Box sx={{ mb: 4 }}>
+            <MealTimeSelector onMealTimeChange={handleMealTimeChange} />
+          </Box>
+          <Box sx={{ mb: 4 }}>
+            <MoodCuisineSelector 
+              onPreferencesChange={handlePreferencesChange}
+              loading={isLoading}
+              recipe={recipe}
+            />
+          </Box>
+          
+          {error && (
+            <Box sx={{ color: 'error.main', mb: 2, textAlign: 'center' }}>
+              {error}
+            </Box>
+          )}
+
+          <Box sx={{ display: 'flex', justifyContent: 'center', mb: 4 }}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleSubmit}
+              disabled={isLoading || !ingredients.length || !mealTime || !preferences.length}
+              sx={{ minWidth: 200 }}
+            >
+              {isLoading ? <CircularProgress size={24} color="inherit" /> : 'Generate Recipe'}
+            </Button>
+          </Box>
+
+          {isLoading && (
+            <Box sx={{ textAlign: 'center', my: 4 }}>
+              <CircularProgress />
+              <Box sx={{ mt: 2 }}>Generating your perfect recipe...</Box>
+            </Box>
+          )}
+
+          {recipe && !isLoading && (
+            <RecipeCard recipe={recipe} />
+          )}
         </Container>
         <Footer />
       </Box>
